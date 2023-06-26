@@ -197,8 +197,8 @@ def get_consensus_mask(vol_shape, nodule_dict):
 
     return nod_sl, mask_output, intersection_of_mask_output, union_of_mask_output, uncertainty_output, flag
 
-CASE_LIST = ['LIDC-IDRI-0028']
-''''LIDC-IDRI-0032',
+CASE_LIST = ['LIDC-IDRI-0028',
+'LIDC-IDRI-0032',
 'LIDC-IDRI-0062',
 'LIDC-IDRI-0071',
 'LIDC-IDRI-0100',
@@ -338,7 +338,7 @@ CASE_LIST = ['LIDC-IDRI-0028']
 'LIDC-IDRI-0988',
 'LIDC-IDRI-0992',
 'LIDC-IDRI-0995',
-'LIDC-IDRI-0979']'''
+'LIDC-IDRI-0979']
 
 
 
