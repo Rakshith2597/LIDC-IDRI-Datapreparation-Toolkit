@@ -15,6 +15,11 @@ def extract_nodule_attributes(annotations_file, patches_directory):
         tuple: A tuple containing the unique values and their counts for each nodule attribute
             (subtlety, texture, sphericity, margin, lobulation, spiculation, malignancy).
     """
+    assert isinstance(annotations_file, str), "annotations_file should be a string"
+    assert isinstance(patches_directory, str), "patches_directory should be a string"
+    assert os.path.isfile(annotations_file), f"{annotations_file} is not a valid file path"
+    assert os.path.isdir(patches_directory), f"{patches_directory} is not a valid directory path"
+
     with open(annotations_file) as f:
         dataset_annotation = json.load(f)
 
@@ -32,14 +37,19 @@ def extract_nodule_attributes(annotations_file, patches_directory):
         slice_num = filename.split('_')[1]
         nod_temp = filename.split('_')[2]
         nodule_num = nod_temp.split('.')[0]
+        assert series_uid in dataset_annotation, f"Series UID {series_uid} not found in annotations"
+        assert nodule_num in dataset_annotation[series_uid], f"Nodule number {nodule_num} not found for series UID {series_uid}"
         nodule_attribute = dataset_annotation[series_uid][nodule_num]
-        sub_list.append(nodule_attribute['attributes']['subtlety'])
-        text_list.append(nodule_attribute['attributes']['texture'])
-        sp_list.append(nodule_attribute['attributes']['sphericity'])
-        margin_list.append(nodule_attribute['attributes']['margin'])
-        lob_list.append(nodule_attribute['attributes']['lobulation'])
-        spic_list.append(nodule_attribute['attributes']['spiculation'])
-        mal_list.append(nodule_attribute['attributes']['malignancy'])
+        assert 'attributes' in nodule_attribute, f"No 'attributes' found for nodule {nodule_num} in series UID {series_uid}"
+
+        attributes = nodule_attribute['attributes']
+        sub_list.append(attributes['subtlety'])
+        text_list.append(attributes['texture'])
+        sp_list.append(attributes['sphericity'])
+        margin_list.append(attributes['margin'])
+        lob_list.append(attributes['lobulation'])
+        spic_list.append(attributes['spiculation'])
+        mal_list.append(attributes['malignancy'])
 
     unique_sub, counts_sub = np.unique(sub_list, return_counts=True)
     unique_text, counts_text = np.unique(text_list, return_counts=True)
