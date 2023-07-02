@@ -10,6 +10,8 @@ def load_json_file(file_path):
     Returns:
         list: The data loaded from the JSON file.
     """
+    assert isinstance(file_path, str), "file_path should be a string"
+    
     with open(file_path) as f:
         data = json.load(f)
     return data
@@ -25,6 +27,8 @@ def merge_json_lists(*json_files):
     Returns:
         list: The merged list from the JSON files.
     """
+    assert all(isinstance(file_path, str) for file_path in json_files), "json_files should contain only strings"
+    
     merged_list = []
     for file_path in json_files:
         data = load_json_file(file_path)
