@@ -151,8 +151,14 @@ class ImageUtils:
         - img (numpy.ndarray): Loaded image as a NumPy array.
 
         """
+        assert isinstance(filename, str), "filename should be a string"
+
         img_path = os.path.join(self.imgdir, filename)
+        assert os.path.isfile(img_path), "Invalid image file"
+
         img = np.load(img_path)
+        assert isinstance(img, np.ndarray), "img should be a NumPy array"
+
         return img
 
     def plot_histogram(self, img):
@@ -166,6 +172,9 @@ class ImageUtils:
         - None
 
         """
+        assert isinstance(img, np.ndarray), "img should be a NumPy array"
+        assert img.ndim == 2, "img should be a 2D array"
+
         plt.hist(img)
         plt.show()
 
