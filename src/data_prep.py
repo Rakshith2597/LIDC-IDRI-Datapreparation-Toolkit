@@ -25,6 +25,8 @@ def process_data():
     """
     savepath = 'lidc_data'  # Relative path to the save directory
 
+    assert isinstance(savepath, str), "savepath should be a string"
+
     if not os.path.exists(savepath):
         os.makedirs(savepath)
 
@@ -36,10 +38,17 @@ def process_data():
         series_uid = scan.series_instance_uid
         patient_id = scan.patient_id
 
+        assert isinstance(series_uid, str), "series_uid should be a string"
+        assert isinstance(patient_id, str), "patient_id should be a string"
+
         if patient_id not in CASE_LIST and series_uid not in failed_cases:
             vol = scan.to_volume(verbose=False)
             vol_shape = vol.shape
             nods = scan.cluster_annotations()
+
+            assert isinstance(vol_shape, tuple), "vol_shape should be a tuple"
+            assert len(vol_shape) == 3, "vol_shape should have three dimensions"
+            assert isinstance(nods, list), "nods should be a list"
 
             if len(scan.annotations) > 0:
                 slice_list = []  # List to store the slices which have nodules marked
@@ -74,12 +83,26 @@ def process_data():
 
                 series_nod[str(series_uid)] = nod_sl
 
+                assert isinstance(consensus_mask, np.ndarray), "consensus_mask should be a numpy array"
+                assert consensus_mask.shape == vol_shape, "consensus_mask shape should match vol_shape"
+                assert isinstance(intersection_mask, np.ndarray), "intersection_mask should be a numpy array"
+                assert intersection_mask.shape == vol_shape, "intersection_mask shape should match vol_shape"
+                assert isinstance(union_mask, np.ndarray), "union_mask should be a numpy array"
+                assert union_mask.shape == vol_shape, "union_mask shape should match vol_shape"
+                assert isinstance(ct_image, np.ndarray), "ct_image should be a numpy array"
+                assert ct_image.shape == vol_shape, "ct_image shape should match vol_shape"
+
                 if flag == True:
                     ct_image = get_hu_image(vol)
                     consensus_path = os.path.join(savepath, 'consensus_masks')
                     intersection_path = os.path.join(savepath, 'intersection_masks')
                     union_path = os.path.join(savepath, 'union_masks')
                     ct_path = os.path.join(savepath, 'images')
+
+                    assert isinstance(consensus_path, str), "consensus_path should be a string"
+                    assert isinstance(intersection_path, str), "intersection_path should be a string"
+                    assert isinstance(union_path, str), "union_path should be a string"
+                    assert isinstance(ct_path, str), "ct_path should be a string"
 
                     if not os.path.exists(consensus_path):
                         os.makedirs(consensus_path)
@@ -103,6 +126,9 @@ def process_data():
                 ct_path = os.path.join(savepath, 'images')
                 consensus_path = os.path.join(savepath, 'consensus_masks')
 
+                assert isinstance(consensus_path, str), "consensus_path should be a string"
+                assert isinstance(ct_path, str), "ct_path should be a string"
+
                 if not os.path.exists(consensus_path):
                     os.makedirs(consensus_path)
                 if not os.path.exists(ct_path):
@@ -113,6 +139,7 @@ def process_data():
 
     with open('seriesuid_nodule_map.json', 'w') as f2:
         json.dump(series_nod, f2)
+
 
 # Call the function to execute the code
 process_data()
