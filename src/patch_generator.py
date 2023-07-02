@@ -89,19 +89,19 @@ class PatchExtractor:
         mask_savepath = os.path.join(self.savepath, 'c_mask')
         u_mask_savepath = os.path.join(self.savepath, 'u_mask')
         i_mask_savepath = os.path.join(self.savepath, 'i_mask')
-        
+
         if not os.path.exists(img_savepath):
             os.makedirs(img_savepath)
-        
+
         if not os.path.exists(mask_savepath):
             os.makedirs(mask_savepath)
-        
+
         if not os.path.exists(u_mask_savepath):
             os.makedirs(u_mask_savepath)
-        
+
         if not os.path.exists(i_mask_savepath):
             os.makedirs(i_mask_savepath)
-        
+
         for series_id in tq(self.series_id_new_list):
             size = 64
             index = 0
@@ -196,7 +196,7 @@ class PatchExtractor:
 
                         if np.shape(patch_img1) != (64, 64):
                             print('shape', np.shape(patch_img1))
-                            print('cordinate of BBox', xr, yr, wr, hr)
+                            print('coordinate of BBox', xr, yr, wr, hr)
 
                         if not os.path.isdir(img_savepath):
                             os.makedirs(img_savepath)
@@ -210,14 +210,21 @@ class PatchExtractor:
                         if not os.path.isdir(i_mask_savepath):
                             os.makedirs(i_mask_savepath)
 
-                        np.save(os.path.join(img_savepath, seriesid + '_' + str(index) + '.npy'), patch_img1)
-                        np.save(os.path.join(mask_savepath, seriesid + '_' + str(index) + '.npy'), patch_mask1)
-                        np.save(os.path.join(u_mask_savepath, seriesid + '_' + str(index) + '.npy'), patch_mask2)
-                        np.save(os.path.join(i_mask_savepath, seriesid + '_' + str(index) + '.npy'), patch_mask3)
+                        if np.shape(patch_img1) != (64, 64):
+                            missing_list.append((filename, sl))
 
+                        patch_img1 = patch_img1 - np.mean(patch_img1)
+                        patch_img1 = patch_img1 / np.std(patch_img1)
+                        np.save(os.path.join(img_savepath, str(seriesid) + '_' + str(sl) + '_' + str(index) + '.npy'), patch_img1)
+                        np.save(os.path.join(mask_savepath, str(seriesid) + '_' + str(sl) + '_' + str(index) + '.npy'), patch_mask1)
+                        np.save(os.path.join(u_mask_savepath, str(seriesid) + '_' + str(sl) + '_' + str(index) + '.npy'), patch_mask2)
+                        np.save(os.path.join(i_mask_savepath, str(seriesid) + '_' + str(sl) + '_' + str(index) + '.npy'), patch_mask3)
                         index += 1
 
-        print('Patches Extraction Completed!')
+        if len(missing_list) > 0:
+            print('Missing List:', missing_list)
+        else:
+            print('All Patches Extracted')
 
 
 #to execute:
