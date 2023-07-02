@@ -13,6 +13,13 @@ def get_hu_image(vol, threshold):
     Returns:
         ndarray: The HU image obtained from the volume after applying the threshold. It has the same shape and data type as the input volume.
     """
+     # Check if vol is a NumPy ndarray
+    assert isinstance(vol, np.ndarray), "vol should be a NumPy ndarray."
+
+    # Check if threshold is a float
+    assert isinstance(threshold, float), "threshold should be a float."
+
+    #Apply thresholding
     image = vol.copy()
     image[image > threshold] = threshold
     image[image < -threshold] = -threshold
