@@ -57,14 +57,26 @@ class PatchExtractor:
         Returns:
             None
         """
+        assert isinstance(self.imgpath, str), "imgpath should be a string."
+        assert isinstance(self.consensus_maskpath, str), "consensus_maskpath should be a string."
+        assert isinstance(self.union_maskpath, str), "union_maskpath should be a string."
+        assert isinstance(self.intersection_maskpath, str), "intersection_maskpath should be a string."
+        assert isinstance(self.seriesuid_nod, dict), "seriesuid_nod should be a dictionary."
+
         self.file_list = os.listdir(self.imgpath)
         self.consensus_list = os.listdir(self.consensus_maskpath)
         self.union_list = os.listdir(self.union_maskpath)
         self.intersection_list = os.listdir(self.intersection_maskpath)
-        
-        self.series_id_list = self.seriesuid_nod.keys()
+
+        self.series_id_list = list(self.seriesuid_nod.keys())  # Obtain the keys of self.seriesuid_nod as a list
+        assert isinstance(self.series_id_list, list), "series_id_list should be a list."
+        assert all(isinstance(id, str) for id in self.series_id_list), "series_id_list should contain strings only."
         self.id_list_2 = [id.split('.npy')[0] for id in self.file_list]
+
+        assert isinstance(self.series_id_new_list, list), "series_id_new_list should be a list."
+        assert all(isinstance(id, str) for id in self.series_id_new_list), "series_id_new_list should contain strings only."
         self.series_id_new_list = [id for id in self.series_id_list if id in self.id_list_2]
+
         
     def process_patches(self):
         """
