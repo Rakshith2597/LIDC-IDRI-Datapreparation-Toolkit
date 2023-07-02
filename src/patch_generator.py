@@ -265,6 +265,10 @@ class ImagePatchSplitter:
         Parameters:
         - filepath (str): The filepath of the seriesuid_nodule_map JSON file.
         """
+
+        assert isinstance(filepath, str), "filepath must be a string"
+        assert os.path.isfile(filepath), "filepath must be a valid file path"
+
         with open(filepath) as f:
             self.seriesuid_nod = json.load(f)
 
