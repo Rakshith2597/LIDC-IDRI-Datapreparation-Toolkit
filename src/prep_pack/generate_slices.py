@@ -49,7 +49,7 @@ def make_mask(height, width, slice_list, *args, **kwargs):
 
     return mask
 
-def extract_slices():
+#def extract_slices():
     """Extracts induvidual slices from the CT volumes given 
     in the dataset, clips the max-min values and stores them
     as numpy arrays.
@@ -149,6 +149,92 @@ def extract_slices():
                     np.save(save_path+'/mask/'+series_instance_uid+'_slice'+str(n)+'.npy',mask)
                 else:
                     np.save(save_path+'/mask/'+series_instance_uid+'_slice'+str(n)+'.npy',mask)
+
+def extract_slices():
+    """
+    Extracts individual slices from the CT volumes given in the dataset, clips the max-min values, and stores them
+    as numpy arrays.
+
+    Returns:
+    - None
+    """
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
+    dataset_path = os.path.join(target_location, 'dataset')
+    save_path = os.path.join(target_location, 'data')
+
+    assert os.path.isdir(dataset_path), "dataset path does not exist"
+    assert os.path.isdir(save_path), "save path does not exist"
+
+    file_list = []
+    for tr in tq(range(10)):
+        subset_path = os.path.join(dataset_path, "subset" + str(tr))
+        assert os.path.isdir(subset_path), f"subset {tr} path does not exist"
+        for file in os.listdir(subset_path):
+            if file.endswith(".mhd"):
+                file_list.append(os.path.join(subset_path, file))
+
+    assert file_list, "no .mhd files found in the dataset"
+
+    for file in tq(file_list):
+        file_name = os.path.basename(file)
+        series_instance_uid = os.path.splitext(file_name)[0]
+        img_file = file
+
+        itk_img = sitk.ReadImage(img_file)
+        img_array = sitk.GetArrayFromImage(itk_img)
+        num_slice, height, width = img_array.shape
+
+        assert num_slice > 0, "invalid number of slices"
+
+        scan = pl.query(pl.Scan).filter(pl.Scan.series_instance_uid == series_instance_uid).first()
+
+        assert scan is not None, "scan not found for the series instance UID"
+
+        nods = scan.cluster_annotations()
+
+        nodule_dict = {}
+        slice_list = []
+        points_dictx = defaultdict(list)
+        points_dicty = defaultdict(list)
+
+        for i, nod in enumerate(nods):
+            nodule_dict[i] = len(nods[i])
+
+        for key, value in nodule_dict.items():
+            for i in range(value):
+                ann = nods[key][i]
+                con = ann.contours[0]
+                k = con.image_k_position
+                slice_list.append(k)
+                ii, jj = ann.contours[0].to_matrix(include_k=False).T
+                points_dictx[k].append(ii)
+                points_dicty[k].append(jj)
+
+        for n in range(1, num_slice):
+            image = img_array[n].copy().astype(np.float32)
+            im_max = np.max(image)
+            im_min = np.min(image)
+            
+            assert im_max is not None, "maximum value not found in image"
+            assert im_min is not None, "minimum value not found in image"
+            
+            if im_max != 0:
+                image[image > 400] = 400
+                image[image < -1000] = -1000
+                mask = make_mask(height, width, slice_list, ii=points_dictx, jj=points_dicty, n=n)
+                mask = np.array(mask, dtype=np.float32)
+                image = image - image.min()
+                image = image / image.max()
+
+                img_save_path = os.path.join(save_path, 'img')
+                assert os.path.isdir(img_save_path), f"img save path does not exist"
+                np.save(os.path.join(img_save_path, series_instance_uid + '_slice' + str(n) + '.npy'), image)
+
+                mask_save_path = os.path.join(save_path, 'mask')
+                assert os.path.isdir(mask_save_path), f"mask save path does not exist"
+                np.save(os.path.join(mask_save_path, series_instance_uid + '_slice' + str(n) + '.npy'), mask)
+
 
 def generate_lungseg():
     """Generates lung masks for each slice.
