@@ -233,6 +233,8 @@ class NoduleAttributesGenerator:
         Returns:
         - series_uid_list (list): The list of series instance UIDs.
         """
+        assert isinstance(self.dataset_annotation, dict), "dataset_annotation must be a dictionary"
+        
         return list(self.dataset_annotation.keys())
 
     def get_attribute_list(self, attribute):
