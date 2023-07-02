@@ -7,46 +7,49 @@ import json
 import argparse
 
 def positive_negative_classifier():
-	"""Classifies slices as positive and negative slices.
+    """Classifies slices as positive and negative slices.
 
-	If any non-zero value is present in the mask/GT of
-	the specified slice then it is classified as positive else negative.
+    If any non-zero value is present in the mask/GT of
+    the specified slice then it is classified as positive else negative.
 
-	Returns
-	-------
-	None
+    Returns
+    -------
+    None
 
-	"""
-	
-	current_dir = os.path.dirname(os.path.realpath(__file__))
-	target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-4])
-	data_path = os.path.join(target_location,'isbi_data2')
-	mask_path = os.path.join(data_path,'masks/')
-	save_path = os.path.join(data_path,'jsons/')
-	if not os.path.isdir(save_path):
-		os.makedirs(save_path)
+    """
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-4])
+    data_path = os.path.join(target_location, 'isbi_data2')
+    mask_path = os.path.join(data_path, 'masks/')
+    save_path = os.path.join(data_path, 'jsons/')
+    if not os.path.isdir(save_path):
+        os.makedirs(save_path)
 
-	file_list=natsorted(os.listdir(mask_path))
-	positive_list,negative_list=[],[]
+    file_list = natsorted(os.listdir(mask_path))
+    positive_list, negative_list = [], []
 
-	for file in tq(file_list):
+    for file in tq(file_list):
+        try:
+            assert isinstance(file, str), "File name should be a string."
 
-		try:
-			mask = np.load(mask_path+file)
-			if (np.any(mask)):
-				positive_list.append(file)
-			else:
-				negative_list.append(file)
-				# break
-		except:
-			print('Skipped %s ,Unable to locate corresponding mask')
-			continue
+            mask = np.load(mask_path + file)
+            assert isinstance(mask, np.ndarray), "Mask should be a NumPy array."
 
-		
-	with open(save_path+'positive_slices.json', 'w') as f:
-		json.dump(positive_list, f)   
-	with open(save_path+'negative_slices.json', 'w') as g:
-		json.dump(negative_list, g) 
+            if np.any(mask):
+                positive_list.append(file)
+            else:
+                negative_list.append(file)
+        except AssertionError as e:
+            print(f"Assertion Error: {e}")
+            continue
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            continue
+
+    with open(save_path + 'positive_slices.json', 'w') as f:
+        json.dump(positive_list, f)
+    with open(save_path + 'negative_slices.json', 'w') as g:
+        json.dump(negative_list, g) 
 
 
 
