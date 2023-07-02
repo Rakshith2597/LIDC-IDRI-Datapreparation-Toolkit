@@ -234,7 +234,7 @@ class NoduleAttributesGenerator:
         - series_uid_list (list): The list of series instance UIDs.
         """
         assert isinstance(self.dataset_annotation, dict), "dataset_annotation must be a dictionary"
-        
+
         return list(self.dataset_annotation.keys())
 
     def get_attribute_list(self, attribute):
@@ -247,4 +247,8 @@ class NoduleAttributesGenerator:
         Returns:
         - attribute_list (list): The list of attribute values.
         """
+
+        assert isinstance(attribute, str), "attribute must be a string"
+        assert isinstance(self.dataset_annotation, dict), "dataset_annotation must be a dictionary"
+        
         return [self.dataset_annotation[uid]['attributes'][attribute] for uid in self.get_series_uid_list()]
