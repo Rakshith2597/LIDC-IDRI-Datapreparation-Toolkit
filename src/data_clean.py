@@ -199,6 +199,9 @@ class MaskUtils:
         - mask_dir (str): Path to the directory containing the masks.
 
         """
+        assert isinstance(mask_dir, str), "mask_dir should be a string"
+        assert os.path.isdir(mask_dir), "Invalid mask directory"
+
         self.mask_dir = mask_dir
 
     def load_masks(self):
@@ -247,12 +250,17 @@ class MaskUtils:
         - cross2_list (list): List of filenames matching cross-shaped mask 2.
 
         """
+        assert isinstance(cross1, np.ndarray), "cross1 should be a NumPy array"
+        assert isinstance(cross2, np.ndarray), "cross2 should be a NumPy array"
+
         mask_list = self.load_masks()
         cross1_list = []
         cross2_list = []
 
         for filename in tqdm(mask_list):
             mask = np.load(os.path.join(self.mask_dir, filename))
+            assert isinstance(mask, np.ndarray), f"Invalid mask file: {filename}"
+
             res1 = match_template(mask, cross1, pad_input=True)
             res2 = match_template(mask, cross2, pad_input=True)
             x1 = np.where(res1 > 0.99)
@@ -276,6 +284,9 @@ class MaskUtils:
         - None
 
         """
+        assert isinstance(cross_list, list), "cross_list should be a list"
+        assert isinstance(output_file, str), "output_file should be a string"
+
         with open(output_file, 'w') as f:
             json.dump(cross_list, f)
 
@@ -290,8 +301,13 @@ class MaskUtils:
         - None
 
         """
+        assert isinstance(mask_list, list), "mask_list should be a list"
+
         for file in mask_list:
+            assert isinstance(file, str), "Invalid mask filename"
             mask = np.load(os.path.join(self.mask_dir, file))
+            assert isinstance(mask, np.ndarray), f"Invalid mask file: {file}"
+
             plt.figure()
             plt.imshow(mask)
             plt.title(file)
