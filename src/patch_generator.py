@@ -242,6 +242,12 @@ class ImagePatchSplitter:
         - current_dir (str): The current directory path.
         - target_location (str): The target location directory path.
         """
+
+        assert isinstance(current_dir, str), "current_dir must be a string"
+        assert isinstance(target_location, str), "target_location must be a string"
+        assert os.path.isdir(current_dir), "current_dir must be a valid directory"
+        assert os.path.isdir(target_location), "target_location must be a valid directory"
+
         self.current_dir = current_dir
         self.target_location = target_location
         self.data_path = os.path.join(target_location, 'isbi_data2')
