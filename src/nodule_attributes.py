@@ -218,6 +218,9 @@ class NoduleAttributesGenerator:
         Returns:
         None
         """
+        assert isinstance(json_path, str), "json_path must be a string"
+        assert json_path.endswith('.json'), "json_path must have a .json extension"
+
         json_path = os.path.relpath(json_path)
 
         with open(json_path) as f:
