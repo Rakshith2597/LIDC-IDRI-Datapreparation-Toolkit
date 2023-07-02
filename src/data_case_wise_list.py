@@ -57,6 +57,10 @@ class NoduleSegmentationStats:
         Returns:
             None
         """
+        assert isinstance(case0_files, list), "case0_files should be a list"
+        assert isinstance(case1_files, list), "case1_files should be a list"
+        assert isinstance(case2_files, list), "case2_files should be a list"
+        
         self.case0_list = merge_json_lists(*case0_files)
         self.case1_list = merge_json_lists(*case1_files)
         self.case2_list = merge_json_lists(*case2_files)
