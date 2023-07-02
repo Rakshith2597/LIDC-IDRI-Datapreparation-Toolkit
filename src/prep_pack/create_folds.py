@@ -243,111 +243,101 @@ def add_additional_slices(series_uid_npylist, fold_npy, series_uid_train, series
     return fold_npy        
 
 def create_balanced_dataset(additional=False):
+    """Creates balanced dataset with equal positive and negative slices
 
-	"""Creates balanced dataset with equal positive and negative slices
+    Parameters
+    ----------
+    additional: bool, optional
+        If True, add additional negative slices
 
-	Parameters
-	----------
-	additional: Boolean,Optional
-		If True add additonal negative slices 
+    Returns
+    -------
+    dict
+        Dictionary with equal positive and negative slices
+    """
+    assert isinstance(additional, bool), "additional should be a boolean value."
 
-	Returns
-	-------
-	dict
-		Returns dict with equal positive and negative slices.
-	"""
-	current_dir = os.path.dirname(os.path.realpath(__file__))
-	target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
-	data_path = os.path.join(target_location,'data')
-	save_path = os.path.join(data_path,'jsons/')
-	img_path = os.path.join(data_path,'img')
-	npy_list=natsorted(os.listdir(img_path))
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
+    data_path = os.path.join(target_location, 'data')
+    save_path = os.path.join(data_path, 'jsons/')
+    img_path = os.path.join(data_path, 'img')
+    npy_list = natsorted(os.listdir(img_path))
 
-	with open(save_path+'positive_slices.json') as c:
-		pos_slices_json=json.load(c)
+    with open(save_path + 'positive_slices.json') as c:
+        pos_slices_json = json.load(c)
 
+    pos_list = [x.split('.mhd')[0] for x in pos_slices_json]
+    pos_list_uq = np.unique(np.array(pos_list))
 
-	pos_list=[x.split('.mhd')[0] for x in pos_slices_json]
-	pos_list_uq=np.unique(np.array(pos_list))
+    print('Sorting entire image set. Will take time.')
+    sorted_list = natsorted(os.listdir(img_path))
 
-		
-	print('Sorting entire image set. Will take time.')
-	sorted_list=natsorted(os.listdir(img_path))
+    print('Sorting completed')
 
-	print('Sorting completed')
+    for i in range(10):
+        with open(save_path + 'fold' + str(i) + '_mhd.json') as f:
+            j_data = json.load(f)
 
+        pos_count = 0
+        neg_count = 0
 
-	for i in tq(range(10)):
-		with open(save_path+'fold'+str(i)+'_mhd.json') as f:
-			j_data=json.load(f)
+        fold_npy = {}
+        fold_npy = defaultdict(lambda: [], fold_npy)
+        series_uid_train = [x.split('.mhd')[0] for x in j_data['train_set']]
+        series_uid_val = [x.split('.mhd')[0] for x in j_data['valid_set']]
+        series_uid_test = [x.split('.mhd')[0] for x in j_data['test_set']]
+        fold_npy_name = 'fold' + str(i) + '_pos_neg_eq.json'
+        series_uid_npylist = [x.split('_')[0] for x in npy_list]
+        series_uid_npylist_uq = np.unique(np.array(series_uid_npylist))
 
-		pos_count=0
-		neg_count=0
-		
-		fold_npy={}
-		fold_npy = defaultdict(lambda:[],fold_npy)
-		series_uid_train=[x.split('.mhd')[0] for x in j_data['train_set']]
-		series_uid_val=[x.split('.mhd')[0] for x in j_data['valid_set']]
-		series_uid_test=[x.split('.mhd')[0] for x in j_data['test_set']]
-		fold_npy_name='fold'+str(i)+'_pos_neg_eq.json'
-		# npy_list=natsorted(os.listdir(img_path))
-		series_uid_npylist=[x.split('_')[0] for x in npy_list]
-		series_uid_npylist_uq=np.unique(np.array(series_uid_npylist))
+        for f, name in enumerate(sorted_list):
 
-		for f,name in enumerate(sorted_list):
+            for q in series_uid_train:
+                if q in name:
+                    if name in pos_slices_json:
+                        pos_count += 1
+                        fold_npy['train_set'].append(name)
+                    elif pos_count > neg_count:
+                        neg_count += 1
+                        fold_npy['train_set'].append(name)
+                    else:
+                        continue
+                else:
+                    continue
 
-			for q in series_uid_train:
-				if q in name :
-					if name in pos_slices_json: 
-						#pos_slices_json contains the list of all positive slices.
-						pos_count += 1
-						fold_npy['train_set'].append(name)
-					elif pos_count>neg_count:
-						# Here the slice will be negative since 'name' not in pos_slices 
-						neg_count += 1
-						fold_npy['train_set'].append(name)
-					else:
-						continue
-				else:
-					continue
+            for q in series_uid_val:
+                if q in name:
+                    if name in pos_slices_json:
+                        pos_count += 1
+                        fold_npy['valid_set'].append(name)
+                    elif pos_count > neg_count:
+                        neg_count += 1
+                        fold_npy['valid_set'].append(name)
+                    else:
+                        continue
+                else:
+                    continue
 
+            for q in series_uid_test:
+                if q in name:
+                    if name in pos_slices_json:
+                        pos_count += 1
+                        fold_npy['test_set'].append(name)
+                    elif pos_count > neg_count:
+                        neg_count += 1
+                        fold_npy['test_set'].append(name)
+                    else:
+                        continue
+                else:
+                    continue
 
-			for q in series_uid_val:
+        with open(save_path + fold_npy_name, 'w') as z:
+            json.dump(fold_npy, z)
 
-				if q in name :
-					if name in pos_slices_json:
+    if additional:
+        fold_npy = add_additional_slices(series_uid_npylist, fold_npy, series_uid_train, series_uid_val, series_uid_test)
 
-						pos_count += 1
-						fold_npy['valid_set'].append(name)
-					elif pos_count>neg_count:
+    print('Balanced dataset identified and json saved')
 
-						neg_count += 1
-						fold_npy['valid_set'].append(name)
-					else:
-						continue
-				else:
-					continue
-
-			for q in series_uid_test:
-				if q in name :
-					if name in pos_slices_json:
-						pos_count += 1
-						fold_npy['test_set'].append(name)
-					elif pos_count>neg_count:
-						neg_count += 1
-						fold_npy['test_set'].append(name)
-					else:
-						continue
-				else:
-					continue
-		with open(save_path+fold_npy_name, 'w') as z:
-			json.dump(fold_npy,z)
-
-	if additional == True:
-		fold_npy = add_additional_slices(series_uid_npylist,fold_npy,series_uid_train,series_uid_val,series_uid_test)
-
-	
-
-	print('Balanced dataset identified and json saved')
-
-	return fold_npy
+    return fold_npy
