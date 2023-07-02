@@ -32,6 +32,9 @@ class PatchExtractor:
     """
 
     def __init__(self, data_path):
+
+        assert isinstance(data_path, str), "Data path should be a string."
+
         self.data_path = data_path
         self.imgpath = os.path.join(data_path, 'images')
         self.consensus_maskpath = os.path.join(data_path, 'consensus_masks')
@@ -39,6 +42,8 @@ class PatchExtractor:
         self.union_maskpath = os.path.join(data_path, 'union_masks')
         self.savepath = os.path.join(data_path, 'patches')
         
+        assert os.path.exists(self.savepath) or os.makedirs(self.savepath), "Failed to create the save path directory."
+
         if not os.path.exists(self.savepath):
             os.makedirs(self.savepath)
         
