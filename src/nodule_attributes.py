@@ -47,6 +47,9 @@ class NoduleAttributesGenerator:
         Returns:
             None
         """
+        assert isinstance(num_scans, int), "num_scans must be an integer."
+        assert num_scans > 0, "num_scans must be a positive integer."
+
         ct_lidc = pl.query(pl.Scan)
         print('Total CT volumes in LIDC:', ct_lidc.count())
 
@@ -55,7 +58,7 @@ class NoduleAttributesGenerator:
         count_nodule_Rad34 = 0
         diam_list_total = []
 
-        for idx, scan in enumerate(tq(ct_lidc)):
+        for idx, scan in enumerate(tqdm(ct_lidc, total=num_scans)):
             series_uid = scan.series_instance_uid
 
             if len(scan.annotations) > 0:
@@ -172,7 +175,7 @@ class NoduleAttributesGenerator:
                 self.dataset_annotation[str(series_uid)] = nodule_anno_dict
                 self.dataset_annotation_unsure[str(series_uid)] = nodule_anno_dict_unsure
 
-                if idx > 3:
+                if idx >= num_scans - 1:
                     break
 
         print('Total nodules:', count_nodule)
