@@ -236,6 +236,13 @@ def generate_positive_patch():
                         xr,yr,wr,hr = cv2.boundingRect(cntr) #Gives X,Y cordinate of BBox origin,height and width
                         xc,yc = int(xr+wr/2),int(yr+hr/2)
 
+                        assert isinstance(xc, int), "xc should be an integer."
+                        assert isinstance(yc, int), "yc should be an integer."
+
+                        assert 0 <= xc < 512, "xc should be within the range [0, 512)."
+                        assert 0 <= yc < 512, "yc should be within the range [0, 512)."
+
+
                         if int(yc-size/2) <0 or int(xc-size/2)<0:
                             if int(yc-size/2) <0 and int(xc-size/2)<0:
                                 patch_img1 = img[0:size , 0:size].copy().astype(np.float16)
