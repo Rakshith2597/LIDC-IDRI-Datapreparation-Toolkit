@@ -287,8 +287,11 @@ class ImagePatchSplitter:
         Saves:
         - Patches: Image patches and corresponding masks as numpy arrays in the 'patches/img' and 'patches/mask' directories.
         """
+        assert isinstance(size, int), "size must be an integer"
+        assert size > 0, "size must be greater than 0"
+
         file_list = os.listdir(self.imgpath)
-        for idx, filename in enumerate(tq(file_list)):
+        for idx, filename in enumerate(file_list):
             index = 0
             img_vol = np.load(os.path.join(self.img_dir, filename))
             mask_vol = np.load(os.path.join(self.mask_dir, filename))
