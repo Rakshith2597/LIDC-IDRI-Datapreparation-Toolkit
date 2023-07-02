@@ -20,27 +20,45 @@ def process_json_file(input_file, output_file):
     Returns:
     - None
     """
+    assert isinstance(input_file, str), "input_file should be a string"
+    assert isinstance(output_file, str), "output_file should be a string"
+
     input_file = os.path.abspath(input_file)
     output_file = os.path.abspath(output_file)
 
     with open(input_file) as f1:
         json_dict = json.load(f1)
 
+    assert isinstance(json_dict, dict), "json_dict should be a dictionary"
+
     id_nod_rel = defaultdict(lambda: '', {})  # Initializing an empty defaultdict
 
     series_uid_list = json_dict.keys()
 
+    assert isinstance(series_uid_list, list), "series_uid_list should be a list"
+
     for series_id in tqdm(series_uid_list):
+        assert isinstance(series_id, str), "series_id should be a string"
+
         nod_list = []
         slice_list = list(json_dict[series_id].keys())
 
+        assert isinstance(slice_list, list), "slice_list should be a list"
+
         for slice_id in slice_list:
+            assert isinstance(slice_id, str), "slice_id should be a string"
+            assert slice_id.isdigit(), "slice_id should be a numeric string"
+
             nod_list.append(json_dict[series_id][slice_id])
+
+        assert all(isinstance(nod_id, int) for nod_id in nod_list), "nod_list should contain integers"
 
         uq_nod_ids = np.unique(nod_list)
         nod_dict = {}
 
         for nod_id in uq_nod_ids:
+            assert isinstance(nod_id, int), "nod_id should be an integer"
+
             idx = np.where(nod_list == nod_id)
             sl_no = [int(slice_list[i]) for i in idx[0]]
             sl_no = sorted(sl_no)
