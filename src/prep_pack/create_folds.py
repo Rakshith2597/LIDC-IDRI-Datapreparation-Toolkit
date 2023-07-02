@@ -54,32 +54,42 @@ def positive_negative_classifier():
 
 
 def subset_classifier():
-	""" Classifies the slices according the subset of origin
+    """ Classifies the slices according to the subset of origin
 
-	Returns
-	-------
-	dict
-		A dictionary consisting of filename according to their subset.
-	"""
-	current_dir = os.path.dirname(os.path.realpath(__file__))
-	target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
-	dataset_path = os.path.join(target_location,'dataset/')
-	data_path = os.path.join(target_location,'data')
-	save_path = os.path.join(data_path,'jsons/')
+    Returns
+    -------
+    dict
+        A dictionary consisting of filenames according to their subset.
+    """
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
+    dataset_path = os.path.join(target_location, 'dataset/')
+    data_path = os.path.join(target_location, 'data')
+    save_path = os.path.join(data_path, 'jsons/')
 
-	dict_subset={}
-	dict_subset = defaultdict(lambda:[],dict_subset)
-	for i in range(10): 
-		#Since 10 subsets are provided in the dataset.
-		for file in tq(os.listdir(dataset_path+'subset'+str(i))):
-			file_name=os.path.basename(file)
-			if file_name.endswith(".mhd"):
-				dict_subset['subset'+str(i)].append(file_name)
+    dict_subset = {}
+    dict_subset = defaultdict(lambda: [], dict_subset)
+    
+    for i in range(10):
+        # Since 10 subsets are provided in the dataset.
+        for file in tq(os.listdir(dataset_path + 'subset' + str(i))):
+            try:
+                assert isinstance(file, str), "File name should be a string."
+                file_name = os.path.basename(file)
+                assert file_name.endswith(".mhd"), "File should have the extension '.mhd'."
 
-	with open(save_path+'subset_classification.json', 'w') as h:
-		json.dump(dict_subset, h)
-		
-	return dict_subset  
+                dict_subset['subset' + str(i)].append(file_name)
+            except AssertionError as e:
+                print(f"Assertion Error: {e}")
+                continue
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                continue
+
+    with open(save_path + 'subset_classification.json', 'w') as h:
+        json.dump(dict_subset, h)
+
+    return dict_subset  
 
 
 
