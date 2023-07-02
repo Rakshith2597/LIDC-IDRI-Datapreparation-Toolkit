@@ -12,30 +12,31 @@ from collections import defaultdict
 def generate_patchlist(patchtype):
     """Generates positive slices in each fold
 
-    Parameters
-    ----------
+    Parameters:
+    - patchtype (str): Positive/negative
 
-    category: str
-        Positive/negative
+    Raises:
+    - AssertionError: If the parameter types or ranges are not as expected.
 
-    Returns
-    -------
-    None
-
+    Returns:
+    - None
     """
 
     current_dir = os.path.dirname(os.path.realpath(__file__))
     target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
-    data_path = os.path.join(target_location,'data')
-    save_path = os.path.join(data_path,'jsons/')
+    data_path = os.path.join(target_location, 'data')
+    save_path = os.path.join(data_path, 'jsons/')
+
+    assert isinstance(patchtype, str), "patchtype should be a string"
 
     for fold_no in tq(range(10)):
-        with open(save_path+'fold'+str(fold_no)+'_pos_neg_eq.json') as file:
+        with open(save_path + 'fold' + str(fold_no) + '_pos_neg_eq.json') as file:
             j_data = json.load(file)
-        with open(save_path+patchtype+'_slices.json') as c:
-            pos_slices_json=json.load(c)
+        with open(save_path + patchtype + '_slices.json') as c:
+            pos_slices_json = json.load(c)
 
-        # print(pos_slices_json)
+        assert isinstance(j_data, dict), "j_data should be a dictionary"
+        assert isinstance(pos_slices_json, dict), "pos_slices_json should be a dictionary"
 
         train_set = j_data['train_set']
         valid_set = j_data['valid_set']
@@ -47,23 +48,23 @@ def generate_patchlist(patchtype):
         for i in train_set:
             if i in pos_slices_json:
                 train_seg_list.append(i)
-                
+
         for i in valid_set:
             if i in pos_slices_json:
                 val_seg_list.append(i)
-                
+
         for i in test_set:
             if i in pos_slices_json:
                 test_seg_list.append(i)
-                
-        patch_npy={}
-        patch_npy = defaultdict(lambda:[],patch_npy) 
+
+        patch_npy = {}
+        patch_npy = defaultdict(lambda: [], patch_npy)
         patch_npy['train_set'] = train_seg_list
         patch_npy['valid_set'] = val_seg_list
         patch_npy['test_set'] = test_seg_list
 
-        with open(save_path+patchtype+'_patchlist_f'+str(fold_no)+'.json', 'w') as z:
-            json.dump(patch_npy,z)
+        with open(save_path + patchtype + '_patchlist_f' + str(fold_no) + '.json', 'w') as z:
+            json.dump(patch_npy, z)
 
 
 
