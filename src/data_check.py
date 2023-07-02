@@ -59,6 +59,8 @@ class LIDCProcessor:
         Returns:
             None
         """
+        assert isinstance(file_path, str), "file_path should be a string"
+        
         with open(file_path) as f:
             self.id_list = json.load(f)
 
@@ -72,6 +74,8 @@ class LIDCProcessor:
         Returns:
             None
         """
+        assert isinstance(directory, str), "directory should be a string"
+
         self.patch_list = os.listdir(directory)
 
     def load_remove_list(self, file_path):
@@ -84,6 +88,8 @@ class LIDCProcessor:
         Returns:
             None
         """
+        assert isinstance(file_path, str), "file_path should be a string"
+
         with open(file_path) as f:
             self.remove_list = json.load(f)
 
@@ -97,6 +103,8 @@ class LIDCProcessor:
         Returns:
             None
         """
+        assert isinstance(series_uid, str), "series_uid should be a string"
+        
         mask_loadpath = os.path.join('storage', 'rakshith', 'lidc_data', 'patches', 'masks')
         image_loadpath = os.path.join('storage', 'rakshith', 'lidc_data', 'patches', 'images')
         mask_list = [mask for mask in self.patch_list if series_uid in mask]
@@ -165,6 +173,8 @@ class LIDCProcessor:
         Returns:
             None
         """
+        assert isinstance(series_uid, str), "series_uid should be a string"
+
         ann = pl.query(pl.Annotation)
         for x in ann:
             if x.scan.series_instance_uid == series_uid:
