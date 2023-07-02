@@ -53,6 +53,13 @@ def get_consensus_mask(vol_shape, nodule_dict):
         - uncertainty_output (ndarray): An intermediate output representing the uncertainty of the consensus mask for each nodule and slice. It has the same shape as the input volume.
         - flag (bool): A flag indicating whether the consensus mask generation was successful or not. If any nodule has an invalid number of radiologist annotations, the flag will be False.
     """
+
+    # Check if vol_shape is a tuple
+    assert isinstance(vol_shape, tuple), "vol_shape should be a tuple."
+    
+    # Check if nodule_dict is a dictionary
+    assert isinstance(nodule_dict, dict), "nodule_dict should be a dictionary."
+    
     temp_mask = np.zeros((512, 512))
     mask_output = np.zeros(vol_shape)
     intersection_of_mask_output = np.zeros(vol_shape)
