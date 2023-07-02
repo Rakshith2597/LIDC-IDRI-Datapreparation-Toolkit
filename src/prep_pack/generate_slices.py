@@ -13,40 +13,39 @@ import cv2
 from tqdm import tqdm as tq
 
 
-def make_mask(height,width,slice_list,*args, **kwargs):
-    """Creates masks from the annotations given.
-
-    Parameters
-    ----------
-    height: int
-        Height of the mask to be created
-    widht: int
-        Width of mask image to be created
-    slice_list: list
-
-    ii,jj: dict
-        Dictionary containing annotations
-
-    Returns
-    -------
-    nparray
-
-
+def make_mask(height, width, slice_list, *args, **kwargs):
     """
-    mask=np.zeros((height,width))
-    n=kwargs.get('n', None)
-    point_dictx=kwargs.get('ii', None)
-    point_dicty=kwargs.get('jj', None)
+    Creates masks from the annotations given.
 
- 
+    Parameters:
+    - height (int): Height of the mask to be created.
+    - width (int): Width of the mask image to be created.
+    - slice_list (list): List of slices.
+    - **kwargs: Additional keyword arguments.
+
+    Returns:
+    - np.ndarray: The created mask.
+    """
+    assert isinstance(height, int) and height > 0, "height should be a positive integer"
+    assert isinstance(width, int) and width > 0, "width should be a positive integer"
+    assert isinstance(slice_list, list), "slice_list should be a list"
+
+    mask = np.zeros((height, width))
+    n = kwargs.get('n', None)
+    point_dictx = kwargs.get('ii', None)
+    point_dicty = kwargs.get('jj', None)
+
     if n in slice_list:
-        temp_listx=point_dictx[n]
-        temp_listy=point_dicty[n]
-        plot_listx= [sum(x)/len(point_dictx[n]) for x in zip(*temp_listx)]
-        plot_listy= [sum(y)/len(point_dicty[n]) for y in zip(*temp_listy)]
-        merged_list =np.array([[plot_listy[i],plot_listx[i]] for i in range(0, len(plot_listx))])
+        assert isinstance(point_dictx, dict), "ii should be a dictionary"
+        assert isinstance(point_dicty, dict), "jj should be a dictionary"
 
-        cv2.fillPoly(mask,pts=np.int32([merged_list]),color=(255,255,255))
+        temp_listx = point_dictx[n]
+        temp_listy = point_dicty[n]
+        plot_listx = [sum(x) / len(point_dictx[n]) for x in zip(*temp_listx)]
+        plot_listy = [sum(y) / len(point_dicty[n]) for y in zip(*temp_listy)]
+        merged_list = np.array([[plot_listy[i], plot_listx[i]] for i in range(len(plot_listx))])
+
+        cv2.fillPoly(mask, pts=np.int32([merged_list]), color=(255, 255, 255))
 
     return mask
 
