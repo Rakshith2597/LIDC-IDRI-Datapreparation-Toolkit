@@ -32,6 +32,12 @@ class NoduleMaskGenerator:
         - flag (bool): Flag indicating whether the consensus mask was successfully generated.
         - nod_sl (dict): Dictionary mapping slice numbers to nodules.
         """
+        assert isinstance(vol_shape, tuple), "vol_shape must be a tuple"
+        assert len(vol_shape) == 3, "vol_shape must have length 3"
+        assert all(isinstance(dim, int) and dim > 0 for dim in vol_shape), "vol_shape dimensions must be positive integers"
+
+        assert isinstance(nodule_dict, dict), "nodule_dict must be a dictionary"
+
         temp_mask = np.zeros((512, 512))
         mask_output = np.zeros(vol_shape)
         flag = True
