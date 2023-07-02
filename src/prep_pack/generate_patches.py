@@ -69,110 +69,123 @@ def generate_patchlist(patchtype):
 
 
 def generate_negative_patch():
-    """Gereates patches which doesn't have nodules
+    """Generates patches which don't have nodules
 
+    Raises:
+    - AssertionError: If the parameter types or ranges are not as expected.
 
-    Returns
-    -------
-    None
+    Returns:
+    - None
     """
     current_dir = os.path.dirname(os.path.realpath(__file__))
     target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
-    data_path = os.path.join(target_location,'data')
-    jsonpath = os.path.join(data_path,'jsons/')
-    imgpath = os.path.join(data_path,'img')
-    lung_segpath = os.path.join(data_path,'lungseg')
-    savepath = os.path.join(data_path,'data')
-    category_list = ['train_set','valid_set','test_set']
+    data_path = os.path.join(target_location, 'data')
+    jsonpath = os.path.join(data_path, 'jsons/')
+    imgpath = os.path.join(data_path, 'img')
+    lung_segpath = os.path.join(data_path, 'lungseg')
+    savepath = os.path.join(data_path, 'data')
+    category_list = ['train_set', 'valid_set', 'test_set']
+
+    assert isinstance(jsonpath, str), "jsonpath should be a string"
+    assert isinstance(imgpath, str), "imgpath should be a string"
+    assert isinstance(lung_segpath, str), "lung_segpath should be a string"
+    assert isinstance(savepath, str), "savepath should be a string"
 
     for fold in tq(range(10)):
-
-        with open(jsonpath+'negative_patchlist_f'+str(fold)+'.json') as file:
+        with open(jsonpath + 'negative_patchlist_f' + str(fold) + '.json') as file:
             j_data = json.load(file)
 
-        for category in category_list:
+        assert isinstance(j_data, dict), "j_data should be a dictionary"
 
+        for category in category_list:
             img_dir = imgpath
             mask_dir = lung_segpath
-            nm_list = j_data[category] 
+            nm_list = j_data[category]
+
+            assert isinstance(nm_list, list), "nm_list should be a list"
 
             size = 64
             index = 0
             for img_name in nm_list:
-                #Loading the masks as uint8 as threshold function accepts 8bit image as parameter.
-                img = np.load(os.path.join(img_dir, img_name)).astype(np.float32)#*255 
-                mask = np.load(os.path.join(mask_dir, img_name)).astype(np.uint8)#*255
+                img = np.load(os.path.join(img_dir, img_name)).astype(np.float32)
+                mask = np.load(os.path.join(mask_dir, img_name)).astype(np.uint8)
+
+                assert isinstance(img, np.ndarray), "img should be a NumPy array"
+                assert isinstance(mask, np.ndarray), "mask should be a NumPy array"
+
+                assert img.ndim == 2, "img should be a 2-dimensional array"
+                assert mask.ndim == 2, "mask should be a 2-dimensional array"
+
+                assert img.shape[0] == 512, "img should have a shape of (512, 512)"
+                assert img.shape[1] == 512, "img should have a shape of (512, 512)"
+                assert mask.shape[0] == 512, "mask should have a shape of (512, 512)"
+                assert mask.shape[1] == 512, "mask should have a shape of (512, 512)"
 
                 if np.any(mask):
-                    #Convert grayscale image to binary
-                    _, th_mask = cv2.threshold(mask, 0.5, 1, 0,cv2.THRESH_BINARY) #parameters are ip_img,threshold,max_value
+                    _, th_mask = cv2.threshold(mask, 0.5, 1, 0, cv2.THRESH_BINARY)
                     contours, hierarchy = cv2.findContours(th_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
                     contours = sorted(contours, key=lambda x: cv2.contourArea(x))
                     
                     #In certain cases there could be more than 2 contour, hence taking the largest 2 which will be lung
                     contours = contours[1:]
-                    
+
                     
                     for cntr in contours:
                         patch_count = 2
                         for i in range(patch_count):
-                            xr,yr,wr,hr = cv2.boundingRect(cntr) #Gives X,Y cordinate of BBox origin,height and width
-                            xc,yc = xr+wr/2,yr+hr/2
-                            
-                            try:
+                            xr, yr, wr, hr = cv2.boundingRect(cntr)
+                            xc, yc = xr + wr / 2, yr + hr / 2
 
-                                x, y = random.randrange(xr, xr+wr-size/2),random.randrange(yr, yr+hr-size/2)
-                                
+                            try:
+                                x = random.randrange(xr, xr + wr - size / 2)
+                                y = random.randrange(yr, yr + hr - size / 2)
                             except:
                                 prob = random.randrange(0, 1)
-                                if prob>0.5:
-                                    x, y = random.randrange(xr, xr+wr/2),random.randrange(yr, yr+hr/2)
+                                if prob > 0.5:
+                                    x = random.randrange(xr, xr + wr // 2)
+                                    y = random.randrange(yr, yr + hr // 2)
                                 else:
-                                    x, y = random.randrange(int(xr+wr/2),xr+wr),random.randrange(int(yr+hr/2),yr+hr)
-                                    
-                            if x+size<512 & y+size<512:
-                                patch_img = img[y: y+size, x: x+size].copy().astype(np.float16)
-                                patch_mask = np.zeros((size,size)).astype(np.float16)
+                                    x = random.randrange(int(xr + wr / 2), xr + wr)
+                                    y = random.randrange(int(yr + hr / 2), yr + hr)
 
+                            assert x >= 0 and x + size < 512, "x coordinate is out of range"
+                            assert y >= 0 and y + size < 512, "y coordinate is out of range"
+
+                            if x + size < 512 and y + size < 512:
+                                patch_img = img[y: y + size, x: x + size].copy().astype(np.float16)
+                                patch_mask = np.zeros((size, size)).astype(np.float16)
                             else:
-                                if x-size<=0 & y-size<=0:
+                                if x - size <= 0 and y - size <= 0:
                                     patch_img = img[0: size, 0: size].copy().astype(np.float16)
-                                    patch_mask = np.zeros((size,size)).astype(np.float16)
-
-                                elif x-size<=0 & y-size>0:
-                                    patch_img = img[y-size: y, 0: size].copy().astype(np.float16)
-                                    patch_mask = np.zeros((size,size)).astype(np.float16)
-
-                                elif x-size>0 & y-size<=0:
-                                    patch_img = img[0: size, x-size: x].copy().astype(np.float16)
-                                    patch_mask = np.zeros((size,size)).astype(np.float16) 
-                                 
+                                    patch_mask = np.zeros((size, size)).astype(np.float16)
+                                elif x - size <= 0 and y - size > 0:
+                                    patch_img = img[y - size: y, 0: size].copy().astype(np.float16)
+                                    patch_mask = np.zeros((size, size)).astype(np.float16)
+                                elif x - size > 0 and y - size <= 0:
+                                    patch_img = img[0: size, x - size: x].copy().astype(np.float16)
+                                    patch_mask = np.zeros((size, size)).astype(np.float16)
                                 else:
-                                    
-                                    patch_img = img[y-size: y, x-size: x].copy().astype(np.float16)
-                                    patch_mask = np.zeros((size,size)).astype(np.float16)
+                                    patch_img = img[y - size: y, x - size: x].copy().astype(np.float16)
+                                    patch_mask = np.zeros((size, size)).astype(np.float16)
 
+                            assert patch_img.shape == (64, 64), "patch_img has an unexpected shape"
+                            assert patch_mask.shape == (64, 64), "patch_mask has an unexpected shape"
 
-
-                            if np.shape(patch_img) != (64,64):
-                                print('shape',np.shape(patch_img))
-                                print('cordinate of patch',x,x+size,y,y+size)
-                                print('cordinate of BBox',xr,yr,wr,hr)
-                                               
                             index += 1
-                            img_savepath = savepath+'/patches/'+'/img/'
-                            mask_savepath = savepath+'/patches/'+'/mask/'
+                            img_savepath = savepath + '/patches/' + '/img/'
+                            mask_savepath = savepath + '/patches/' + '/mask/'
+
                             if not os.path.isdir(img_savepath):
-                                os.makedirs(savepath+'/patches/'+'/img/')
-                                np.save(img_savepath+'patch_'+str(fold)+'_'+str(index)+'.npy',patch_img)
+                                os.makedirs(savepath + '/patches/' + '/img/')
+                                np.save(img_savepath + 'patch_' + str(fold) + '_' + str(index) + '.npy', patch_img)
                             else:
-                                np.save(img_savepath+'patch_'+str(fold)+'_'+str(index)+'.npy',patch_img)
+                                np.save(img_savepath + 'patch_' + str(fold) + '_' + str(index) + '.npy', patch_img)
 
                             if not os.path.isdir(mask_savepath):
-                                os.makedirs(savepath+'/patches/'+'/mask/')
-                                np.save(mask_savepath+'patch_'+str(fold)+'_'+str(index)+'.npy',patch_mask)
+                                os.makedirs(savepath + '/patches/' + '/mask/')
+                                np.save(mask_savepath + 'patch_' + str(fold) + '_' + str(index) + '.npy', patch_mask)
                             else:
-                                np.save(mask_savepath+'patch_'+str(fold)+'_'+str(index)+'.npy',patch_mask)
+                                np.save(mask_savepath + 'patch_' + str(fold) + '_' + str(index) + '.npy', patch_mask)
 
 
 def generate_positive_patch():
