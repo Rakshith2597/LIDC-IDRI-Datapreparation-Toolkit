@@ -89,20 +89,37 @@ def calculate_mean_std(imgdir):
     - mean (float): Mean of pixel intensities.
     - std (float): Standard deviation of pixel intensities.
     """
+    assert isinstance(imgdir, str), "imgdir should be a string"
+    assert os.path.isdir(imgdir), "imgdir should be a valid directory"
+
     # Load the first image to calculate mean
     img_path = os.path.join(imgdir, os.listdir(imgdir)[0])
     img = np.load(img_path).astype(np.float32)
+
+    assert isinstance(img, np.ndarray), "img should be a NumPy array"
+    assert img.dtype == np.float32, "img should have dtype float32"
+    assert img.ndim == 2, "img should be a 2D array"
+
     mean = np.mean(img)
 
     # Calculate the standard deviation
     numerator = 0
 
-    for i in tqdm(os.listdir(imgdir)):
+    file_list = os.listdir(imgdir)
+    assert len(file_list) > 0, "imgdir should contain at least one image file"
+
+    for i in tqdm(file_list):
         img_path = os.path.join(imgdir, i)
         img = np.load(img_path).astype(np.float32)
+
+        assert isinstance(img, np.ndarray), "img should be a NumPy array"
+        assert img.dtype == np.float32, "img should have dtype float32"
+        assert img.ndim == 2, "img should be a 2D array"
+        assert img.shape == (64, 64), "img should have shape (64, 64)"
+
         numerator += np.sum((img - mean) ** 2)
 
-    std = math.sqrt(numerator / (len(os.listdir(imgdir)) * 64 * 64))
+    std = math.sqrt(numerator / (len(file_list) * 64 * 64))
 
     return mean, std
 
