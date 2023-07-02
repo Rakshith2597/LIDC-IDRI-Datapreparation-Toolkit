@@ -16,8 +16,17 @@ def highest_rank(lst):
     Returns:
         object: The most common element in the list.
     """
+    assert isinstance(lst, list), "lst must be a list."
+    assert len(lst) > 0, "lst cannot be empty."
+
     data = Counter(lst)
-    return data.most_common(1)[0][0]
+    most_common_elements = data.most_common()
+
+    assert len(most_common_elements) > 0, "No elements found in the list."
+
+    #added an assertion to ensure that the list contains at least one element.
+    most_common_element = most_common_elements[0][0]
+    return most_common_element
 
 class NoduleAttributesGenerator:
     def __init__(self):
