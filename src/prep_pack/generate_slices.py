@@ -236,7 +236,7 @@ def extract_slices():
                 np.save(os.path.join(mask_save_path, series_instance_uid + '_slice' + str(n) + '.npy'), mask)
 
 
-def generate_lungseg():
+#def generate_lungseg():
     """Generates lung masks for each slice.
 
 
@@ -268,3 +268,65 @@ def generate_lungseg():
             else:
                 np.save(save_path+'lungseg/'+series_instance_uid+'_slice'+str(n)+'.npy',img_array[n])
 
+def generate_lungseg():
+    """Generates lung masks for each slice.
+
+    Raises:
+    - AssertionError: If the parameter types or ranges are not as expected.
+
+    Returns:
+    - None
+    """
+
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
+    dataset_path = os.path.join(target_location, 'dataset/seg-lungs-LUNA16')
+    save_path = os.path.join(target_location, 'data/')
+
+    assert isinstance(dataset_path, str), "dataset_path should be a string"
+    assert isinstance(save_path, str), "save_path should be a string"
+
+    assert os.path.isdir(dataset_path), "dataset_path does not exist"
+    assert os.path.isdir(save_path), "save_path does not exist"
+
+    volume_list = os.listdir(dataset_path)
+    file_list = []
+
+    assert isinstance(volume_list, list), "volume_list should be a list"
+
+    for file in volume_list:
+        if file.endswith(".mhd"):
+            file_list.append(os.path.join(dataset_path, file))
+
+    for img_file in file_list:
+        file_name = os.path.basename(img_file)
+        series_instance_uid = os.path.splitext(file_name)[0]
+
+        assert isinstance(series_instance_uid, str), "series_instance_uid should be a string"
+
+        itk_img = sitk.ReadImage(img_file)
+        img_array = sitk.GetArrayFromImage(itk_img)
+
+        assert isinstance(img_array, np.ndarray), "img_array should be a NumPy array"
+
+        num_slice, height, width = img_array.shape
+
+        assert isinstance(num_slice, int), "num_slice should be an integer"
+        assert num_slice > 0, "num_slice should be greater than 0"
+
+        assert isinstance(height, int), "height should be an integer"
+        assert height > 0, "height should be greater than 0"
+
+        assert isinstance(width, int), "width should be an integer"
+        assert width > 0, "width should be greater than 0"
+
+        img_array[img_array > 0] = 1
+
+        for n in range(1, num_slice):
+            if not os.path.isdir(save_path + 'lungseg'):
+                os.makedirs(save_path + 'lungseg')
+
+            assert isinstance(n, int), "n should be an integer"
+            assert 1 <= n < num_slice, "n should be in the range [1, num_slice)"
+
+            np.save(save_path + 'lungseg/' + series_instance_uid + '_slice' + str(n) + '.npy', img_array[n])
