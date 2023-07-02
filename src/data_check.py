@@ -16,6 +16,8 @@ def get_hu_image(vol):
     Returns:
         ndarray: The HU image.
     """
+    assert isinstance(vol, np.ndarray), "vol should be a NumPy array"
+
     image = vol.copy()
     image[image > 400] = -1000
     image[image < -1000] = -1000
@@ -32,6 +34,8 @@ def get_hu_image_new(vol):
     Returns:
         ndarray: The HU image.
     """
+    assert isinstance(vol, np.ndarray), "vol should be a NumPy array"
+
     image = vol.copy()
     image = image - 1024
     image[image > 1000] = 1000
