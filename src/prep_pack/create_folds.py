@@ -94,39 +94,49 @@ def subset_classifier():
 
 
 def assign_folds(dict_subset):
-	""" Divides subsets into train,validation and testing sets of corresponding folds 
+    """ Divides subsets into train, validation, and testing sets of corresponding folds 
 
-	Parameters
-	----------
-	dict_subset: dict
-		Dictionary which has the files and its corresponding subset
+    Parameters
+    ----------
+    dict_subset: dict
+        Dictionary which has the files and their corresponding subset
 
-	Returns
-	-------
-	None
-	"""
-	current_dir = os.path.dirname(os.path.realpath(__file__))
-	target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
-	save_path = os.path.join(target_location,'data/jsons/')
+    Returns
+    -------
+    None
+    """
+    assert isinstance(dict_subset, dict), "dict_subset should be a dictionary."
 
-	dataset_list=[dict_subset['subset0'],dict_subset['subset1'],
-					dict_subset['subset2'],dict_subset['subset3'],
-					dict_subset['subset4'],dict_subset['subset5'],
-					dict_subset['subset6'],dict_subset['subset7'],
-					dict_subset['subset8'],dict_subset['subset9']]
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
+    save_path = os.path.join(target_location, 'data/jsons/')
 
-	for i in tq(range(10)): #10 Subsets in the dataset
+    dataset_list = [
+        dict_subset['subset0'], dict_subset['subset1'], dict_subset['subset2'],
+        dict_subset['subset3'], dict_subset['subset4'], dict_subset['subset5'],
+        dict_subset['subset6'], dict_subset['subset7'], dict_subset['subset8'],
+        dict_subset['subset9']
+    ]
 
-		fold={}
-		fold = defaultdict(lambda:0,fold)
-		fold['train_set']=dataset_list[0-i]+dataset_list[1-i]+dataset_list[2-i]+dataset_list[3-i]+dataset_list[4-i]+dataset_list[5-i]+dataset_list[6-i]+dataset_list[7-i]
-		fold['valid_set']=dataset_list[8-i]
-		fold['test_set']=dataset_list[9-i]
-		
-		
-		fold_name='fold'+str(i)+'_mhd.json'
-		with open(save_path+fold_name, 'w') as j:
-			json.dump(fold, j)
+    for i in tq(range(10)):  # 10 Subsets in the dataset
+        try:
+            assert all(isinstance(subset, list) for subset in dataset_list), "Dataset list should contain lists of files."
+            
+            fold = {}
+            fold = defaultdict(lambda: 0, fold)
+            fold['train_set'] = dataset_list[0 - i] + dataset_list[1 - i] + dataset_list[2 - i] + dataset_list[3 - i] + dataset_list[4 - i] + dataset_list[5 - i] + dataset_list[6 - i] + dataset_list[7 - i]
+            fold['valid_set'] = dataset_list[8 - i]
+            fold['test_set'] = dataset_list[9 - i]
+
+            fold_name = 'fold' + str(i) + '_mhd.json'
+            with open(save_path + fold_name, 'w') as j:
+                json.dump(fold, j)
+        except AssertionError as e:
+            print(f"Assertion Error: {e}")
+            continue
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            continue
 			 
 
 def add_additional_slices(series_uid_npylist,fold_npy,series_uid_train,series_uid_val,series_uid_test):
