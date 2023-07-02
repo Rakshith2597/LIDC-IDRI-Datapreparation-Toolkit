@@ -139,77 +139,108 @@ def assign_folds(dict_subset):
             continue
 			 
 
-def add_additional_slices(series_uid_npylist,fold_npy,series_uid_train,series_uid_val,series_uid_test):
+def add_additional_slices(series_uid_npylist, fold_npy, series_uid_train, series_uid_val, series_uid_test):
+    """Adds additional negative slices to the prepared data list
 
-	"""Adds additional negative slices to the prepared datalist
+    Parameters
+    ----------
+    series_uid_npylist: np.array
+        Array of series UID values
+    fold_npy: dict
+        Dictionary of fold data
+    series_uid_train: list
+        List of series UID values for training set
+    series_uid_val: list
+        List of series UID values for validation set
+    series_uid_test: list
+        List of series UID values for testing set
 
-	Parameters
-	----------
-	series_uid_npylist: nparray
-	fold_npy: dict
-	series_uid_train: list
-	sereies_uid_val: list
-	sereies_uid_test: list
+    Returns
+    -------
+    dict
+        Updated fold dictionary
+    """
+    assert isinstance(series_uid_npylist, np.ndarray), "series_uid_npylist should be a NumPy array."
+    assert isinstance(fold_npy, dict), "fold_npy should be a dictionary."
+    assert isinstance(series_uid_train, list), "series_uid_train should be a list."
+    assert isinstance(series_uid_val, list), "series_uid_val should be a list."
+    assert isinstance(series_uid_test, list), "series_uid_test should be a list."
 
-	Returns
-	-------
-	dict
+    count = {}
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
+    save_path = os.path.join(target_location, 'data/jsons/')
 
-	"""
-	count = {}
-	current_dir = os.path.dirname(os.path.realpath(__file__))
-	target_location = os.path.sep.join(current_dir.split(os.path.sep)[:-3])
-	save_path = os.path.join(target_location,'data/jsons/')
-	with open(save_path+'positive_slices.json') as c:
-		pos_slices_json=json.load(c)
+    with open(save_path + 'positive_slices.json') as c:
+        pos_slices_json = json.load(c)
 
+    pos_list = [x.split('.mhd')[0] for x in pos_slices_json]
+    pos_list_uq = np.unique(np.array(pos_list))
 
+    for i in series_uid_train:
+        c = series_uid_npylist.count(i)
+        count[i] = c
 
-	pos_list=[x.split('.mhd')[0] for x in pos_slices_json]
-	pos_list_uq=np.unique(np.array(pos_list))
-		
-	for i in (series_uid_train):
-		c = series_uid_npylist.count(i)
-		count[i] = c
-		
-		if i in pos_list:
+        if i in pos_list:
+            try:
+                assert isinstance(c, int), "The count should be an integer."
 
-			for j in range(5):
-				file = str(i)+'_slice'+str(j)+'.npy'
-				fold_npy['train_set'].append(file)
-			for j in range(count[i]-5,count[i]):
-				file = str(i)+'_slice'+str(j)+'.npy'
-				fold_npy['train_set'].append(file)    
+                for j in range(5):
+                    file = str(i) + '_slice' + str(j) + '.npy'
+                    fold_npy['train_set'].append(file)
+                for j in range(count[i] - 5, count[i]):
+                    file = str(i) + '_slice' + str(j) + '.npy'
+                    fold_npy['train_set'].append(file)
+            except AssertionError as e:
+                print(f"Assertion Error: {e}")
+                continue
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                continue
 
+    for i in series_uid_val:
+        c = series_uid_npylist.count(i)
+        count[i] = c
 
-	for i in (series_uid_val):
-		c = series_uid_npylist.count(i)
-		count[i] = c
-		
-		if i in pos_list:
+        if i in pos_list:
+            try:
+                assert isinstance(c, int), "The count should be an integer."
 
-			for j in range(5):
-				file = str(i)+'_slice'+str(j)+'.npy'
-				fold_npy['valid_set'].append(file)
-			for j in range(count[i]-5,count[i]):
-				file = str(i)+'_slice'+str(j)+'.npy'
-				fold_npy['valid_set'].append(file)  
+                for j in range(5):
+                    file = str(i) + '_slice' + str(j) + '.npy'
+                    fold_npy['valid_set'].append(file)
+                for j in range(count[i] - 5, count[i]):
+                    file = str(i) + '_slice' + str(j) + '.npy'
+                    fold_npy['valid_set'].append(file)
+            except AssertionError as e:
+                print(f"Assertion Error: {e}")
+                continue
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                continue
 
+    for i in series_uid_test:
+        c = series_uid_npylist.count(i)
+        count[i] = c
 
-	for i in (series_uid_test):
-		c = series_uid_npylist.count(i)
-		count[i] = c
-		
-		if i in pos_list:
+        if i in pos_list:
+            try:
+                assert isinstance(c, int), "The count should be an integer."
 
-			for j in range(5):
-				file = str(i)+'_slice'+str(j)+'.npy'
-				fold_npy['test_set'].append(file)
-			for j in range(count[i]-5,count[i]):
-				file = str(i)+'_slice'+str(j)+'.npy'
-				fold_npy['test_set'].append(file) 
+                for j in range(5):
+                    file = str(i) + '_slice' + str(j) + '.npy'
+                    fold_npy['test_set'].append(file)
+                for j in range(count[i] - 5, count[i]):
+                    file = str(i) + '_slice' + str(j) + '.npy'
+                    fold_npy['test_set'].append(file)
+            except AssertionError as e:
+                print(f"Assertion Error: {e}")
+                continue
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                continue
 
-	return fold_npy        
+    return fold_npy        
 
 def create_balanced_dataset(additional=False):
 
