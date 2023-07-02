@@ -376,29 +376,41 @@ class ImagePatchSplitter:
         Returns:
             None
         """
+        assert isinstance(self.imgpath, str), "imgpath must be a string."
+        assert os.path.isdir(self.imgpath), "imgpath does not exist or is not a directory."
+
         image_list = os.listdir(self.imgpath)
+        assert len(image_list) > 0, "No files found in imgpath."
+
         series_list = []
         for file in image_list:
             seriesid = file.split('_')[0]
             if seriesid not in series_list:
                 series_list.append(seriesid)
 
-        test_list = random.sample(series_list, 70)
-        valid_list = []
-        train_list = []
-        count = 0
-        for file in series_list:
-            if file not in test_list:
-                valid_list.append(file)
-                count += 1
+        assert len(series_list) >= 3, "Not enough unique series IDs in the image data."
 
-            if count == 70:
-                break
+        assert isinstance(self.imgpath, str), "imgpath must be a string."
+        assert os.path.isdir(self.imgpath), "imgpath does not exist or is not a directory."
 
-        for file in series_list:
-            if file not in test_list:
-                if file not in valid_list:
-                    train_list.append(file)
+        test_ratio = 0.1
+        valid_ratio = 0.2
+        train_ratio = 1 - test_ratio - valid_ratio
+
+        num_test = int(test_ratio * len(series_list))
+        num_valid = int(valid_ratio * len(series_list))
+
+        assert num_test > 0, "Test set size is too small."
+        assert num_valid > 0, "Validation set size is too small."
+
+        random.shuffle(series_list)
+        test_list = series_list[:num_test]
+        valid_list = series_list[num_test:num_test+num_valid]
+        train_list = series_list[num_test+num_valid:]
+
+        assert len(train_list) > 0, "Empty training set."
+        assert len(valid_list) > 0, "Empty validation set."
+        assert len(test_list) > 0, "Empty test set."
 
         train_image_list = []
         valid_image_list = []
@@ -419,6 +431,11 @@ class ImagePatchSplitter:
                 if idx in file:
                     test_image_list.append(file)
 
+        assert len(train_image_list) > 0, "No images found for the training set."
+        assert len(valid_image_list) > 0, "No images found for the validation set."
+        assert len(test_image_list) > 0, "No images found for the test set."
+
         patch_split = {'train_set': train_image_list, 'valid_set': valid_image_list, 'test_set': test_image_list}
+
         with open('patch_split_new.json', 'w') as f:
             json.dump(patch_split, f)
