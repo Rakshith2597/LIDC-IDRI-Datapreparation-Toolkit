@@ -1,11 +1,14 @@
 #for review
+import json
+import os
+import os.path
+
+import numpy as np
 import pylidc as pl
 from tqdm import tqdm as tq
-import os
-import numpy as np
+
 from .prep_utils import CASE_LIST, get_consensus_mask, get_hu_image
-import json
-import os.path
+
 
 def process_data():
     """

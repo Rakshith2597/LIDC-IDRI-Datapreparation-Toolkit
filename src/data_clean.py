@@ -1,14 +1,15 @@
 #for review
 
 import json
-import numpy as np
-from collections import defaultdict
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import os
-import cv2
 import math
+import os
+from collections import defaultdict
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 from skimage.feature import match_template
+from tqdm import tqdm
 
 
 def process_json_file(input_file, output_file):
@@ -75,6 +76,8 @@ def process_json_file(input_file, output_file):
 
 
 # Call the function to execute the code
+# Static paths needs to be changed
+
 input_file_path = 'LIDC-IDRI/nodule_segmentation_2022/jsons/seriesuid_nodule_map.json'
 output_file_path = 'nodule_segmentation_2022/jsons/seriesuid_nodule_map_new.json'
 process_json_file(input_file_path, output_file_path)
@@ -132,6 +135,10 @@ print(mean)
 print(std)
 
 class ImageUtils:
+    """
+    Add docstring here
+    
+    """
     def __init__(self, imgdir):
         """
         Utility class for image operations.
@@ -181,6 +188,7 @@ class ImageUtils:
         plt.show()
 
 # Create an instance of ImageUtils
+#static path to be removed
 imgdir = 'storage/rakshith/lidc_data/patches/img'
 image_utils = ImageUtils(imgdir)
 
