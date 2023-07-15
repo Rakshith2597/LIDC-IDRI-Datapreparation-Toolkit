@@ -326,6 +326,6 @@ class MaskUtils:
 
 
 # Create an instance of MaskUtils
-mask_dir = '/storage/rakshith/lidc_data/patches/masks'
-mask_utils = Mask
+#mask_dir = '/storage/rakshith/lidc_data/patches/masks'
+#mask_utils = Mask
 
