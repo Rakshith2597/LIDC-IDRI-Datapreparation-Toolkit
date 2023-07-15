@@ -78,9 +78,9 @@ def process_json_file(input_file, output_file):
 # Call the function to execute the code
 # Static paths needs to be changed
 
-input_file_path = 'LIDC-IDRI/nodule_segmentation_2022/jsons/seriesuid_nodule_map.json'
-output_file_path = 'nodule_segmentation_2022/jsons/seriesuid_nodule_map_new.json'
-process_json_file(input_file_path, output_file_path)
+INPUT_FILE_PATH = 'LIDC-IDRI/nodule_segmentation_2022/jsons/seriesuid_nodule_map.json'
+OUTPUT_FILE_PATH = 'nodule_segmentation_2022/jsons/seriesuid_nodule_map_new.json'
+process_json_file(INPUT_FILE_PATH, OUTPUT_FILE_PATH)
 
 
 def calculate_mean_std(imgdir):
