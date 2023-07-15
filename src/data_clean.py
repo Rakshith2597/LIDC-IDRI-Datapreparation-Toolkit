@@ -129,10 +129,10 @@ def calculate_mean_std(imgdir : str):
     return mean, std
 
 # Call the function and print the results
-imgdir = 'storage/rakshith/lidc_data/patches/img'
-mean, std = calculate_mean_std(imgdir)
-print(mean)
-print(std)
+#imgdir = 'storage/rakshith/lidc_data/patches/img'
+#mean, std = calculate_mean_std(imgdir)
+#print(mean)
+#print(std)
 
 class ImageUtils:
     """
