@@ -201,9 +201,12 @@ class ImageUtils:
 
 
 class MaskUtils:
+    """
+    Utility class for mask operations.
+    """
     def __init__(self, mask_dir):
         """
-        Utility class for mask operations.
+        Initializing class MaskUtils.
 
         Parameters:
         - mask_dir (str): Path to the directory containing the masks.
