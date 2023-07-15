@@ -83,7 +83,7 @@ OUTPUT_FILE_PATH = 'nodule_segmentation_2022/jsons/seriesuid_nodule_map_new.json
 process_json_file(INPUT_FILE_PATH, OUTPUT_FILE_PATH)
 
 
-def calculate_mean_std(imgdir):
+def calculate_mean_std(imgdir : str):
     """
     Calculate the mean and standard deviation of pixel intensities in a directory of images.
 
