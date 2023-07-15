@@ -136,12 +136,12 @@ def calculate_mean_std(imgdir : str):
 
 class ImageUtils:
     """
-    Add docstring here
+    Utility class for image operations.
     
     """
     def __init__(self, imgdir):
         """
-        Utility class for image operations.
+        Initialize the ImageUtils class.
 
         Parameters:
         - imgdir (str): Path to the directory containing the images.
