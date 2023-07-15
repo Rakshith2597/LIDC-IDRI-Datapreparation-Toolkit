@@ -29,7 +29,7 @@ def process_json_file(input_file, output_file):
     input_file = os.path.abspath(input_file)
     output_file = os.path.abspath(output_file)
 
-    with open(input_file) as f1:
+    with open(input_file, encoding='utf-8') as f1:
         json_dict = json.load(f1)
 
     assert isinstance(json_dict, dict), "json_dict should be a dictionary"
@@ -71,7 +71,7 @@ def process_json_file(input_file, output_file):
 
         id_nod_rel[series_id] = nod_dict
 
-    with open(output_file, 'w') as f1:
+    with open(output_file, 'w', encoding='utf-8') as f1:
         json.dump(id_nod_rel, f1)
 
 
@@ -297,7 +297,7 @@ class MaskUtils:
         assert isinstance(cross_list, list), "cross_list should be a list"
         assert isinstance(output_file, str), "output_file should be a string"
 
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(cross_list, f)
 
     def plot_masks(self, mask_list):
