@@ -189,15 +189,15 @@ class ImageUtils:
 
 # Create an instance of ImageUtils
 #static path to be removed
-imgdir = 'storage/rakshith/lidc_data/patches/img'
-image_utils = ImageUtils(imgdir)
+#imgdir = 'storage/rakshith/lidc_data/patches/img'
+#image_utils = ImageUtils(imgdir)
 
 # Load the first image
-img_files = os.listdir(imgdir)
-img = image_utils.load_image(img_files[0])
+#img_files = os.listdir(imgdir)
+#img = image_utils.load_image(img_files[0])
 
 # Plot the histogram
-image_utils.plot_histogram(img)
+#image_utils.plot_histogram(img)
 
 
 class MaskUtils:
