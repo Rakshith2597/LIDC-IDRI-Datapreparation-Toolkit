@@ -4,6 +4,7 @@ import json
 import math
 import os
 from collections import defaultdict
+from .misc import data_clean_hist
 
 import cv2
 import matplotlib.pyplot as plt
