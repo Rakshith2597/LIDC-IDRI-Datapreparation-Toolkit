@@ -170,3 +170,44 @@ def data_diff_visualize_nodule(series_uid, clevel=0.5, pad=[(20,20),(20,20),(0,0
 # example usage: 
 # series_uid = '1.3.6.1.4.1.14519.5.2.1.6279.6001.298806137288633453246975630178' 
 # visualize_nodule(series_uid)
+
+
+def data_case_wise_list_plot_variability_count(case_data, colors=None):
+  """
+  Plots a bar chart showing count of different variability cases.
+
+  Args:
+    case_data (dict): Dictionary with case names as keys and counts as values
+    colors (list): List of colors for each bar
+
+  Returns: 
+    fig: matplotlib figure object
+
+  Raises:
+    ImportError: If matplotlib is not installed
+
+  """
+
+  if plt is None:
+    raise ImportError("Matplotlib required for plotting")
+
+  cases = list(case_data.keys())
+  values = list(case_data.values())
+
+  if not colors:
+    colors = ['red', 'yellow', 'blue']
+
+  fig = plt.figure(figsize=(10, 5))
+  plt.xticks(fontsize=20)
+  plt.yticks(fontsize=20)
+
+  plt.bar(cases, values, color=colors)
+  plt.xlabel("Type of variability", fontsize=28)
+  plt.ylabel("Count", fontsize=28)
+  
+  return fig
+
+#example usage:
+# data = {'Case 0': 10, 'Case 1': 15, 'Case 2': 20}
+# fig = plot_variability_count_chart(data)
+# plt.show()
