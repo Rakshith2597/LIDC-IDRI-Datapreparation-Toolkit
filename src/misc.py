@@ -3,6 +3,11 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
+import numpy as np
+import matplotlib.pyplot as plt
+from skimage.measure import find_contours
+import pylidc as pl
+from pylidc.utils import consensus
 
 
 
@@ -114,3 +119,60 @@ def data_diff_plot_uncertain_ratio(ratio, img_path, union_path, intersection_pat
 # example usage: 
 # ratio = 0.9
 # plot_images(ratio, img_path, union_path, intersection_path, consensus_path)
+
+
+def data_diff_visualize_nodule(series_uid, clevel=0.5, pad=[(20,20),(20,20),(0,0)]):
+  """
+  Visualize lung nodule annotations and consensus contour for a given CT scan.
+  
+  Args:
+    series_uid (str): Series instance UID of the CT scan
+    clevel (float): Consensus level threshold  
+    pad (list): Padding to add context 
+
+  Returns:
+    None
+  
+  Raises:
+    ImportError: If matplotlib/pylidc is not installed
+  """
+
+  if plt is None or pl is None:
+    raise ImportError("Matplotlib and pylidc must be installed")
+
+  scan = pl.query(pl.Scan).filter(pl.Scan.series_instance_uid == series_uid).first()
+
+  vol = scan.to_volume()
+
+  nods = scan.cluster_annotations()
+
+  print(f"Number of nodule clusters: {len(nods)}")
+
+  for i in range(len(nods)):
+
+    anns = nods[i]
+
+    cmask, cbbox, masks = consensus(anns, clevel=clevel, pad=pad)
+
+    k = int(0.5*(cbbox[2].stop - cbbox[2].start))
+
+    fig, ax = plt.subplots(1,1, figsize=(5,5))
+    ax.imshow(vol[cbbox][:,:,k], cmap=plt.cm.gray, alpha=0.5)
+
+    colors = ['r', 'g', 'b', 'y']
+    for j in range(len(masks)):
+      for c in find_contours(masks[j][:,:,k].astype(float), 0.5):
+        label = f"Annotation {j+1}"  
+        plt.plot(c[:,1], c[:,0], colors[j], label=label)
+
+    for c in find_contours(cmask[:,:,k].astype(float), 0.5):  
+      plt.plot(c[:,1], c[:,0], '--k', label='50% Consensus')
+
+    ax.axis('off')
+    ax.legend()
+    plt.tight_layout()
+    plt.show()
+
+# example usage: 
+# series_uid = '1.3.6.1.4.1.14519.5.2.1.6279.6001.298806137288633453246975630178' 
+# visualize_nodule(series_uid)
