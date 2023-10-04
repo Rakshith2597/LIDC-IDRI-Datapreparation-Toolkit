@@ -1,11 +1,14 @@
-import pylidc as pl
-from tqdm.notebook import tqdm as tq
+#for review
 import json
 import os
-import numpy as np
-import matplotlib.pyplot as plt
 from collections import defaultdict
+
 import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import pylidc as pl
+from tqdm.notebook import tqdm as tq
+
 
 class NoduleMaskGenerator:
     def __init__(self, savepath):

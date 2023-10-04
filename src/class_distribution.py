@@ -1,3 +1,4 @@
+#for review
 import os
 import json
 from tqdm.notebook import tqdm as tq
@@ -5,23 +6,23 @@ import numpy as np
 
 def extract_nodule_attributes(annotations_file, patches_directory):
     """
-    Extracts nodule attributes from patch filenames based on the provided annotations file.
+    Extracts attributes of the nodule from the annotation JSON file.
 
     Args:
         annotations_file (str): The path to the JSON file containing the nodule annotations.
-        patches_directory (str): The path to the directory containing the patch files.
+        patches_directory (str): The path to the directory containing the patches.
 
     Returns:
         tuple: A tuple containing the unique values and their counts for each nodule attribute
             (subtlety, texture, sphericity, margin, lobulation, spiculation, malignancy).
     """
-    assert isinstance(annotations_file, str), "annotations_file should be a string"
-    assert isinstance(patches_directory, str), "patches_directory should be a string"
-    assert os.path.isfile(annotations_file), f"{annotations_file} is not a valid file path"
-    assert os.path.isdir(patches_directory), f"{patches_directory} is not a valid directory path"
+    assert isinstance(annotations_file, str), "The 'annotations_file' argument should be of data type string"
+    assert isinstance(patches_directory, str), "The 'patches_directory' argument should be of data type string"
+    assert os.path.isfile(annotations_file), f"{annotations_file} is not a valid path"
+    assert os.path.isdir(patches_directory), f"{patches_directory} is not a valid path"
 
-    with open(annotations_file) as f:
-        dataset_annotation = json.load(f)
+    with open(annotations_file) as json_file:
+        dataset_annotation = json.load(json_file)
 
     file_list = os.listdir(patches_directory)
     sub_list = []
@@ -34,7 +35,6 @@ def extract_nodule_attributes(annotations_file, patches_directory):
 
     for filename in tq(file_list):
         series_uid = filename.split('_')[0]
-        slice_num = filename.split('_')[1]
         nod_temp = filename.split('_')[2]
         nodule_num = nod_temp.split('.')[0]
         assert series_uid in dataset_annotation, f"Series UID {series_uid} not found in annotations"

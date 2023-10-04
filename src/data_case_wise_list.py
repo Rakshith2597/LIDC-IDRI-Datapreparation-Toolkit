@@ -1,5 +1,8 @@
+#for review
 import json
 
+
+# Move load_json_file to a common utility file. Call it wherever it is being used.
 def load_json_file(file_path):
     """
     Load data from a JSON file.
@@ -12,8 +15,8 @@ def load_json_file(file_path):
     """
     assert isinstance(file_path, str), "file_path should be a string"
     
-    with open(file_path) as f:
-        data = json.load(f)
+    with open(file_path) as json_file:
+        data = json.load(json_file)
     return data
 
 
@@ -37,6 +40,9 @@ def merge_json_lists(*json_files):
 
 
 class NoduleSegmentationStats:
+    '''
+    Add doctring here
+    '''
     def __init__(self):
         self.case0_list = []
         self.case1_list = []

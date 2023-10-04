@@ -1,12 +1,16 @@
+# for review
+
 import json
-import numpy as np
-from collections import defaultdict
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import os
-import cv2
 import math
+import os
+from collections import defaultdict
+from .misc import data_clean_hist
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 from skimage.feature import match_template
+from tqdm import tqdm
 
 
 def process_json_file(input_file, output_file):
@@ -26,16 +30,18 @@ def process_json_file(input_file, output_file):
     input_file = os.path.abspath(input_file)
     output_file = os.path.abspath(output_file)
 
-    with open(input_file) as f1:
+    with open(input_file, encoding='utf-8') as f1:
         json_dict = json.load(f1)
 
     assert isinstance(json_dict, dict), "json_dict should be a dictionary"
 
-    id_nod_rel = defaultdict(lambda: '', {})  # Initializing an empty defaultdict
+    # Initializing an empty defaultdict
+    id_nod_rel = defaultdict(lambda: '', {})
 
     series_uid_list = json_dict.keys()
 
-    assert isinstance(series_uid_list, list), "series_uid_list should be a list"
+    assert isinstance(
+        series_uid_list, list), "series_uid_list should be a list"
 
     for series_id in tqdm(series_uid_list):
         assert isinstance(series_id, str), "series_id should be a string"
@@ -51,7 +57,8 @@ def process_json_file(input_file, output_file):
 
             nod_list.append(json_dict[series_id][slice_id])
 
-        assert all(isinstance(nod_id, int) for nod_id in nod_list), "nod_list should contain integers"
+        assert all(isinstance(nod_id, int)
+                   for nod_id in nod_list), "nod_list should contain integers"
 
         uq_nod_ids = np.unique(nod_list)
         nod_dict = {}
@@ -68,17 +75,19 @@ def process_json_file(input_file, output_file):
 
         id_nod_rel[series_id] = nod_dict
 
-    with open(output_file, 'w') as f1:
+    with open(output_file, 'w', encoding='utf-8') as f1:
         json.dump(id_nod_rel, f1)
 
 
 # Call the function to execute the code
-input_file_path = 'LIDC-IDRI/nodule_segmentation_2022/jsons/seriesuid_nodule_map.json'
-output_file_path = 'nodule_segmentation_2022/jsons/seriesuid_nodule_map_new.json'
-process_json_file(input_file_path, output_file_path)
+# Static paths needs to be changed
+
+INPUT_FILE_PATH = 'LIDC-IDRI/nodule_segmentation_2022/jsons/seriesuid_nodule_map.json'
+OUTPUT_FILE_PATH = 'nodule_segmentation_2022/jsons/seriesuid_nodule_map_new.json'
+process_json_file(INPUT_FILE_PATH, OUTPUT_FILE_PATH)
 
 
-def calculate_mean_std(imgdir):
+def calculate_mean_std(imgdir: str):
     """
     Calculate the mean and standard deviation of pixel intensities in a directory of images.
 
@@ -124,15 +133,21 @@ def calculate_mean_std(imgdir):
     return mean, std
 
 # Call the function and print the results
-imgdir = 'storage/rakshith/lidc_data/patches/img'
-mean, std = calculate_mean_std(imgdir)
-print(mean)
-print(std)
+# imgdir = 'storage/rakshith/lidc_data/patches/img'
+# mean, std = calculate_mean_std(imgdir)
+# print(mean)
+# print(std)
+
 
 class ImageUtils:
+    """
+    Utility class for image operations.
+
+    """
+
     def __init__(self, imgdir):
         """
-        Utility class for image operations.
+        Initialize the ImageUtils class.
 
         Parameters:
         - imgdir (str): Path to the directory containing the images.
@@ -179,21 +194,26 @@ class ImageUtils:
         plt.show()
 
 # Create an instance of ImageUtils
-imgdir = 'storage/rakshith/lidc_data/patches/img'
-image_utils = ImageUtils(imgdir)
+# static path to be removed
+# imgdir = 'storage/rakshith/lidc_data/patches/img'
+# image_utils = ImageUtils(imgdir)
 
 # Load the first image
-img_files = os.listdir(imgdir)
-img = image_utils.load_image(img_files[0])
+# img_files = os.listdir(imgdir)
+# img = image_utils.load_image(img_files[0])
 
 # Plot the histogram
-image_utils.plot_histogram(img)
+# image_utils.plot_histogram(img)
 
 
 class MaskUtils:
+    """
+    Utility class for mask operations.
+    """
+
     def __init__(self, mask_dir):
         """
-        Utility class for mask operations.
+        Initializing class MaskUtils.
 
         Parameters:
         - mask_dir (str): Path to the directory containing the masks.
@@ -259,7 +279,8 @@ class MaskUtils:
 
         for filename in tqdm(mask_list):
             mask = np.load(os.path.join(self.mask_dir, filename))
-            assert isinstance(mask, np.ndarray), f"Invalid mask file: {filename}"
+            assert isinstance(
+                mask, np.ndarray), f"Invalid mask file: {filename}"
 
             res1 = match_template(mask, cross1, pad_input=True)
             res2 = match_template(mask, cross2, pad_input=True)
@@ -287,7 +308,7 @@ class MaskUtils:
         assert isinstance(cross_list, list), "cross_list should be a list"
         assert isinstance(output_file, str), "output_file should be a string"
 
-        with open(output_file, 'w') as f:
+        with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(cross_list, f)
 
     def plot_masks(self, mask_list):
@@ -316,6 +337,5 @@ class MaskUtils:
 
 
 # Create an instance of MaskUtils
-mask_dir = '/storage/rakshith/lidc_data/patches/masks'
-mask_utils = Mask
-
+# mask_dir = '/storage/rakshith/lidc_data/patches/masks'
+# mask_utils = Mask

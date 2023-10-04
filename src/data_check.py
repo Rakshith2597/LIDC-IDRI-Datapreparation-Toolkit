@@ -1,49 +1,34 @@
-import pylidc as pl
-import os
-from tqdm import tqdm
-import matplotlib.pyplot as plt
+#for review
 import json
+import os
+
+import matplotlib.pyplot as plt
 import numpy as np
+import pylidc as pl
+from tqdm import tqdm
 
 
 def get_hu_image(vol):
     """
-    Convert the input volume to a Hounsfield Unit (HU) image.
+    Calculates the HU values present in the CT volume and thresholds it.
 
     Args:
         vol (ndarray): The input volume.
 
     Returns:
-        ndarray: The HU image.
+        ndarray: Image/CT slice afer thresholding.
     """
-    assert isinstance(vol, np.ndarray), "vol should be a NumPy array"
+    assert isinstance(vol, np.ndarray), "Argument 'vol' should be an ndarray"
 
     image = vol.copy()
-    image[image > 400] = -1000
+    image[image > 1000] = -1000
     image[image < -1000] = -1000
     return image
 
-
-def get_hu_image_new(vol):
-    """
-    Convert the input volume to a Hounsfield Unit (HU) image.
-
-    Args:
-        vol (ndarray): The input volume.
-
-    Returns:
-        ndarray: The HU image.
-    """
-    assert isinstance(vol, np.ndarray), "vol should be a NumPy array"
-
-    image = vol.copy()
-    image = image - 1024
-    image[image > 1000] = 1000
-    image[image < -2000] = -2000
-    return image
-
-
 class LIDCProcessor:
+    '''
+    Add doc string here
+    '''
     def __init__(self):
         self.id_list = []
         self.patch_list = []
@@ -104,7 +89,7 @@ class LIDCProcessor:
             None
         """
         assert isinstance(series_uid, str), "series_uid should be a string"
-        
+# Static path needs to be removed in 93 and 94
         mask_loadpath = os.path.join('storage', 'rakshith', 'lidc_data', 'patches', 'masks')
         image_loadpath = os.path.join('storage', 'rakshith', 'lidc_data', 'patches', 'images')
         mask_list = [mask for mask in self.patch_list if series_uid in mask]
@@ -133,8 +118,10 @@ class LIDCProcessor:
         Returns:
             None
         """
+
+
+# Static path needs to be removed in 124
         file_list = os.listdir(os.path.join('storage', 'rakshith', 'lidc_data', 'patches', 'images'))
-        print(len(file_list))
         for i, f_name in enumerate(tqdm(file_list)):
             series_uid = file_list[i].split('_')[0]
             if series_uid in self.id_list:
