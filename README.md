@@ -1,5 +1,7 @@
 # LIDC-IDRI-Datapreparation-Toolkit
 
+## Project is in early stages.
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 ## Overview and Flair/Badges
